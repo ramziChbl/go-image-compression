@@ -8,11 +8,13 @@ import (
 )
 
 func main() {
-	imageQuality := flag.Int("quality", 50, "quality of the compressed JPEG image")
-	if len(os.Args) <= 1 {
-		fmt.Fprintf(os.Stderr, "No image path was given as an argument\n")
-		os.Exit(1)
+	// Override flag.Usage function to print the argument position and format
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s: %s [--quality QUALITY] IMAGE_PATH\n", os.Args[0], os.Args[0])
+		flag.PrintDefaults()
 	}
+
+	imageQuality := flag.Int("quality", 50, "quality of the compressed JPEG image")
 	flag.Parse()
 	if flag.NArg() == 0 {
 		flag.Usage()
