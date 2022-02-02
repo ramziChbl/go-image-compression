@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"image/jpeg"
 	"os"
+	"path/filepath"
 )
 
 func main() {
+	IMAGES_FOLDER := os.Getenv("IMAGES_FOLDER")
+
 	// Override flag.Usage function to print the argument position and format
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s: %s [--quality QUALITY] IMAGE_PATH\n", os.Args[0], os.Args[0])
@@ -21,18 +24,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	inputPath := flag.Arg(0)
-
-	outputPath, err := compressJPEG(inputPath, *imageQuality)
+	outputPath, err := compressJPEG(IMAGES_FOLDER, flag.Arg(0), *imageQuality)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 	}
 	fmt.Fprintf(os.Stdout, "%s\n", outputPath)
 }
 
-func compressJPEG(inputPath string, imageQuality int) (string, error) {
-	outputPath := "out.jpeg"
-	inReader, err := os.Open(inputPath)
+func compressJPEG(imagesFolderPath string, imageFilename string, imageQuality int) (string, error) {
+	inReader, err := os.Open(filepath.Join(imagesFolderPath, imageFilename))
 	if err != nil {
 		return "", err
 	}
@@ -43,6 +43,7 @@ func compressJPEG(inputPath string, imageQuality int) (string, error) {
 		return "", err
 	}
 
+	outputPath := filepath.Join(imagesFolderPath, "out.jpeg")
 	outWriter, err := os.Create(outputPath)
 	if err != nil {
 		return "", err
